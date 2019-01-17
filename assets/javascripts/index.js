@@ -1,7 +1,39 @@
 
 /* OpenTimestamps functions */
 
-const OpenTimestamps = window.OpenTimestamps;
+const OpenTimestamps = window.OpenTimestamps
+
+// an empty list would be equivalent to the default calendars
+const calendarsList = [
+    'http://calendar.irsa.it:80'
+    'https://alice.btc.calendar.opentimestamps.org', 
+    'https://bob.btc.calendar.opentimestamps.org',
+    'https://finney.calendar.eternitywall.com'
+]
+
+// an empty list is not acceptable here
+const wcalendars = [
+    'http://calendar.irsa.it:80'
+    'https://alice.btc.calendar.opentimestamps.org'
+    'https://bob.btc.calendar.opentimestamps.org',
+    'https://finney.calendar.eternitywall.com'
+]
+const whitelistedCalendars = new OpenTimestamps.Calendar.UrlWhitelist(wcalendars)
+
+const blockexplorers = {
+	bitcoin: {
+	  explorers: [
+    	{url: 'https://blockstream.info/api', type: 'blockstream'},
+    	{url: 'https://blockexplorer.com/api', type: 'insight'}
+      ]
+    },
+    bitcoinTestnet: {
+	  explorers: [
+		{url: 'https://blockstream.info/testnet/api', type: 'blockstream'},
+		{url: 'https://testnet.blockexplorer.com/api', type: 'insight'}
+	  ]
+    }
+}
 
 function stamp(filename, hash, hashType) {
 	Document.progressStart();
@@ -17,8 +49,9 @@ function stamp(filename, hash, hashType) {
 		op = new OpenTimestamps.Ops.OpSHA256();
 	}
 	const detached = OpenTimestamps.DetachedTimestampFile.fromHash(op, hexToBytes(hash));
+	const options = { calendars: calendarsList }
 
-	OpenTimestamps.stamp(detached).then( ()=>{
+	OpenTimestamps.stamp(detached, options).then( ()=>{
 		const ctx = new OpenTimestamps.Context.StreamSerialization();
 		detached.serialize(ctx);
 		const timestampBytes = ctx.getOutput();
@@ -47,10 +80,12 @@ function upgrade_verify(ots, hash, hashType, filename) {
 	const detached = OpenTimestamps.DetachedTimestampFile.fromHash(op, hexToBytes(hash));
 	const detachedOts = OpenTimestamps.DetachedTimestampFile.deserialize(ots);
 
-    Proof.progressStart();
+	Proof.progressStart();
+	
+    const upgradeOptions = { whitelist: whitelistedCalendars }
 
     // OpenTimestamps upgrade command
-    OpenTimestamps.upgrade(detachedOts).then( (changed)=>{
+    OpenTimestamps.upgrade(detachedOts, upgradeOptions).then( (changed)=>{
         const bytes = detachedOts.serializeToBytes();
     	if (changed) {
         	//success('Timestamp has been successfully upgraded!');
@@ -61,7 +96,7 @@ function upgrade_verify(ots, hash, hashType, filename) {
     	} else {
         	// File not changed: just upgraded
     	}
-    	return OpenTimestamps.verifyTimestamp(detachedOts.timestamp)
+    	return OpenTimestamps.verifyTimestamp(detachedOts.timestamp, blockexplorers)
     }).then( (results)=>{
         Proof.progressStop();
 
