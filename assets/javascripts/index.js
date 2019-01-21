@@ -80,7 +80,6 @@ function upgrade_verify(ots, hash, hashType, filename) {
 	} else {
 		op = new OpenTimestamps.Ops.OpSHA256();
 	}
-	const detached = OpenTimestamps.DetachedTimestampFile.fromHash(op, hexToBytes(hash));
 	const detachedOts = OpenTimestamps.DetachedTimestampFile.deserialize(ots);
 
 	Proof.progressStart();

@@ -81,6 +81,13 @@ function printAttestation (item,fork){
             '<a class="copy"></a>' +
             '</div>';
         color = "green";
+    } else if(item.type == "BitcoinTestnetBlockHeaderAttestation"){
+            title = "Bitcoin Testnet Attestation";
+            content = 'Merkle root of Bitcoin Testnet block ' +
+                '<strong class="hash" style="display: inline;">'+item.param+'</strong>' +
+                '<a class="copy"></a>' +
+                '</div>';
+            color="gold";
     } else if(item.type == "LitecoinBlockHeaderAttestation"){
         title = "Litecoin Attestation";
         content = 'Merkle root of Litecoin block ' +
