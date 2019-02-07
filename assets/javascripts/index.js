@@ -5,7 +5,8 @@ const OpenTimestamps = window.OpenTimestamps
 
 // an empty list would be equivalent to the default calendars
 const calendarsList = [
-    'http://test-calendar.aniasafe.it:80',
+    'http://test-calendar.aniasafe.it:80',  // testnet
+    'http://calendar.aniasafe.it:80',       // mainet
     'https://alice.btc.calendar.opentimestamps.org', 
     'https://bob.btc.calendar.opentimestamps.org',
     'https://finney.calendar.eternitywall.com'
@@ -13,7 +14,8 @@ const calendarsList = [
 
 // an empty list is not acceptable here
 const wcalendars = [
-    'http://test-calendar.aniasafe.it:80',
+    'http://test-calendar.aniasafe.it:80',  // testnet
+    'http://calendar.aniasafe.it:80',       // mainet
     'https://alice.btc.calendar.opentimestamps.org',
     'https://bob.btc.calendar.opentimestamps.org',
     'https://finney.calendar.eternitywall.com'
@@ -48,6 +50,7 @@ function stamp(filename, hash, hashType) {
 	} else {
 		op = new OpenTimestamps.Ops.OpSHA256();
 	}
+	
 	const detached = OpenTimestamps.DetachedTimestampFile.fromHash(op, hexToBytes(hash));
 	const options = { calendars: calendarsList }
 
